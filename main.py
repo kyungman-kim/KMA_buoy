@@ -1,5 +1,6 @@
 import os
 import time
+import shutil
 import requests
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
@@ -22,7 +23,7 @@ plt.rcParams["axes.unicode_minus"] = False
 
 
 def fetch_one_hour(tm_str):
-    """kma_buoy.php: 풍향/풍속/파고/파주기/파향까지 모두 제공"""
+    """kma_buoy.php: 풍향/풍속/파고/파주기/파향 모두 제공"""
     url = "https://apihub.kma.go.kr/api/typ01/url/kma_buoy.php"
     params = {"tm": tm_str, "stn": POHANG_STN, "help": 0, "authKey": KMA_API_KEY}
     r = requests.get(url, params=params, timeout=30)
@@ -32,7 +33,7 @@ def fetch_one_hour(tm_str):
 
 def parse_response(text):
     """
-    kma_buoy.php 응답 (공백 구분, 17개 컬럼):
+    응답 형식 (공백 구분, 17개 컬럼):
     [0]TM [1]STN [2]WD1 [3]WS1 [4]WS1_GST [5]WD2 [6]WS2 [7]WS2_GST
     [8]PA [9]HM [10]TA [11]TW [12]WH_MAX [13]WH_SIG [14]WH_AVE [15]WP [16]WO
     """
@@ -60,11 +61,11 @@ def parse_response(text):
 
             out.append({
                 "tm": tm,
-                "wd": f(parts[2]),    # 풍향 WD1
-                "ws": f(parts[3]),    # 풍속 WS1
-                "wh": f(parts[13]),   # 유의파고 WH_SIG
-                "wp": f(parts[15]),   # 파주기 WP
-                "wo": f(parts[16]),   # 파향 WO
+                "wd": f(parts[2]),    # 풍향
+                "ws": f(parts[3]),    # 풍속
+                "wh": f(parts[13]),   # 유의파고
+                "wp": f(parts[15]),   # 파주기
+                "wo": f(parts[16]),   # 파향
             })
         except Exception as e:
             print(f"parse skip: {line[:100]} ({e})")
@@ -146,9 +147,12 @@ def make_plot(rows, out_path):
 
 if __name__ == "__main__":
     Path("plots").mkdir(exist_ok=True)
+    Path("docs").mkdir(exist_ok=True)
     rows = fetch_period()
     print(f"\nTotal collected: {len(rows)} rows")
     if not rows:
         raise SystemExit("No data fetched")
     make_plot(rows, "plots/latest.png")
-    print("Saved plots/latest.png")
+    # 뷰어 페이지용 사본
+    shutil.copy("plots/latest.png", "docs/latest.png")
+    print("Saved plots/latest.png and docs/latest.png")
