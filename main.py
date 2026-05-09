@@ -9,7 +9,7 @@ from pathlib import Path
 
 # ---------- 설정 ----------
 KMA_API_KEY = os.environ["KMA_API_KEY"]
-POHANG_STN = "22106"
+POHANG_STN = "22106"                    #  포항
 KST = timezone(timedelta(hours=9))
 
 # ---------- 한글 폰트 ----------
