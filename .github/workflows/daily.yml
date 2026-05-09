@@ -35,7 +35,7 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add plots/
+          git add plots/ docs/
           git diff --cached --quiet || git commit -m "Update plot $(date -u +%Y-%m-%d_%H%M)"
           git push
 
