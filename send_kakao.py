@@ -10,6 +10,9 @@ KAKAO_REFRESH_TOKEN = os.environ["KAKAO_REFRESH_TOKEN"]
 GITHUB_REPO = os.environ["GITHUB_REPOSITORY"]
 KST = timezone(timedelta(hours=9))
 
+# GitHub Pages 뷰어 URL (본인 저장소에 맞게 수정)
+VIEWER_URL = "https://kyungman-kim.github.io/KMA_buoy/"
+
 
 def refresh_access_token():
     r = requests.post(
@@ -41,19 +44,19 @@ def wait_for_image(url, max_attempts=20, interval=5):
     return False
 
 
-def send_to_self(image_url):
+def send_to_self(image_url, link_url):
     access_token = refresh_access_token()
     template = {
         "object_type": "feed",
         "content": {
             "title": f"포항 부이 일일보고 ({datetime.now(KST):%m-%d %H:%M})",
-            "description": "최근 72시간 바람·파랑 시계열",
+            "description": "최근 72시간 바람·파랑 시계열 (탭하여 확대)",
             "image_url": image_url,
             "image_width": 1600,
             "image_height": 900,
             "link": {
-                "web_url": image_url,
-                "mobile_web_url": image_url,
+                "web_url": link_url,
+                "mobile_web_url": link_url,
             },
         },
     }
@@ -70,7 +73,8 @@ def send_to_self(image_url):
 if __name__ == "__main__":
     ts = int(datetime.now().timestamp())
     image_url = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/plots/latest.png?t={ts}"
-    print(f"Image URL: {image_url}")
+    print(f"Image URL : {image_url}")
+    print(f"Viewer URL: {VIEWER_URL}")
     if not wait_for_image(image_url):
-        raise SystemExit("Image URL not accessible — Kakao would also fail")
-    send_to_self(image_url)
+        raise SystemExit("Image URL not accessible")
+    send_to_self(image_url, VIEWER_URL)
