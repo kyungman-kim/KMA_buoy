@@ -2,7 +2,7 @@ name: Daily Buoy Bot
 
 on:
   schedule:
-    - cron: '0 23 * * *'   # 매일 한국시간 +9h  -> 오전 8시
+    - cron: '0 23 * * *'   # 한국시간 오전 8시
   workflow_dispatch:
 
 permissions:
@@ -38,3 +38,10 @@ jobs:
           git add plots/
           git diff --cached --quiet || git commit -m "Update plot $(date -u +%Y-%m-%d_%H%M)"
           git push
+
+      - name: Send Kakao
+        run: python send_kakao.py
+        env:
+          KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
+          KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
+          KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
