@@ -1,4 +1,4 @@
-ame: Daily Weather Bot
+name: Daily Weather Bot
 
 on:
   schedule:
