@@ -1,7 +1,6 @@
 import os
 import time
 import requests
-import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import matplotlib.font_manager as fm
@@ -96,29 +95,19 @@ def fetch_period():
     return uniq
 
 
-def plot_direction_arrows(ax, times, dirs, label, color="black"):
-    """
-    방향(degree, 'from' 기준)을 화살표 심볼로 표시.
-    화살표는 '바람·파도가 가는 방향'으로 향함.
-    """
+def plot_direction_circles(ax, times, dirs, label, color="black"):
+    """방향(degree)을 원형 심볼로 표시. y축 0~360°, 90° 틱."""
     valid = [(t, d) for t, d in zip(times, dirs) if d is not None]
+    ax.set_ylim(0, 360)
+    ax.set_yticks([0, 90, 180, 270, 360])
+    ax.set_ylabel(label + " (°)")
+    ax.grid(True, alpha=0.3)
     if not valid:
         ax.text(0.5, 0.5, "데이터 없음", transform=ax.transAxes, ha="center")
-        ax.set_yticks([])
-        ax.set_ylabel(label)
         return
     vt = [x[0] for x in valid]
-    vd = np.array([x[1] for x in valid], dtype=float)
-    rad = np.deg2rad(vd)
-    u = -np.sin(rad)   # '~로부터'의 반대 방향 = 진행 방향
-    v = -np.cos(rad)
-    ax.quiver(vt, np.zeros(len(vt)), u, v,
-              angles="uv", scale_units="inches", scale=5,
-              width=0.004, color=color, pivot="mid")
-    ax.set_ylim(-1, 1)
-    ax.set_yticks([])
-    ax.set_ylabel(label)
-    ax.axhline(0, color="gray", linewidth=0.3, alpha=0.5)
+    vd = [x[1] for x in valid]
+    ax.scatter(vt, vd, s=25, color=color, marker="o", alpha=0.8)
 
 
 def make_plot(rows, out_path):
@@ -128,24 +117,19 @@ def make_plot(rows, out_path):
     wh = [r["wh"] for r in rows]
     wo = [r["wo"] for r in rows]
 
-    fig, axes = plt.subplots(
-        4, 1, figsize=(12, 9), sharex=True,
-        gridspec_kw={"height_ratios": [3, 1, 3, 1]},
-    )
+    fig, axes = plt.subplots(4, 1, figsize=(12, 10), sharex=True)
 
     axes[0].plot(times, ws, marker="o", color="tab:blue", markersize=3)
     axes[0].set_ylabel("풍속 (m/s)")
     axes[0].grid(True, alpha=0.3)
 
-    plot_direction_arrows(axes[1], times, wd, "풍향", color="tab:blue")
-    axes[1].grid(True, alpha=0.3)
+    plot_direction_circles(axes[1], times, wd, "풍향", color="tab:blue")
 
     axes[2].plot(times, wh, marker="o", color="navy", markersize=3)
     axes[2].set_ylabel("유의파고 (m)")
     axes[2].grid(True, alpha=0.3)
 
-    plot_direction_arrows(axes[3], times, wo, "파향", color="navy")
-    axes[3].grid(True, alpha=0.3)
+    plot_direction_circles(axes[3], times, wo, "파향", color="navy")
 
     axes[3].xaxis.set_major_formatter(mdates.DateFormatter("%m/%d\n%H시"))
     axes[3].xaxis.set_major_locator(mdates.HourLocator(byhour=[0, 6, 12, 18]))
