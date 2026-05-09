@@ -117,7 +117,7 @@ def make_plot(rows, out_path):
     wh = [r["wh"] for r in rows]
     wo = [r["wo"] for r in rows]
 
-    fig, axes = plt.subplots(4, 1, figsize=(12, 10), sharex=True)
+    fig, axes = plt.subplots(4, 1, figsize=(16, 9), sharex=True)
 
     axes[0].plot(times, ws, marker="o", color="tab:blue", markersize=3)
     axes[0].set_ylabel("풍속 (m/s)")
