@@ -8,7 +8,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 # ---------- 설정 ----------
-KMA_API_KEY = os.environ["2dzySNW3SiGc8kjVt1ohEw"]
+KMA_API_KEY = os.environ[""KMA_API_KEY"]
 POHANG_STN = "22106"  # ← STEP B에서 찾은 포항 부이 번호로 수정!
 KST = timezone(timedelta(hours=9))
 
